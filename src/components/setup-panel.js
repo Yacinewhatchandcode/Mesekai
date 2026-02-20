@@ -8,6 +8,8 @@ export default function SetupPanel({
     onAvatarUpload,
     photoUrl,
     onPhotoUpload,
+    onGenerate3D,
+    isGenerating,
     accessories,
     onAddAccessory,
     onUpdateAccessory,
@@ -20,8 +22,28 @@ export default function SetupPanel({
     const photoInputRef = useRef(null)
     const [avatarDragOver, setAvatarDragOver] = useState(false)
     const [accDragOver, setAccDragOver] = useState(false)
+    const [aiMessage, setAiMessage] = useState('')
+    const [isAiLoading, setIsAiLoading] = useState(false)
 
     const prevent = (e) => { e.preventDefault(); e.stopPropagation() }
+
+    const talkToAgent = async () => {
+        setIsAiLoading(true)
+        try {
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messages: [{ role: 'user', content: "I'm setting up my 3D Livestream Avatar. Act as my Sovereign technical assistant and give me a brief, one-sentence hyped confirmation." }]
+                })
+            })
+            const data = await res.json()
+            if (data.content) setAiMessage(data.content)
+        } catch (e) {
+            console.error(e)
+        }
+        setIsAiLoading(false)
+    }
 
     return (
         <div className="setup-sidebar">
@@ -53,6 +75,29 @@ export default function SetupPanel({
                     </div>
                     <input ref={photoInputRef} type="file" accept="image/*" hidden
                         onChange={(e) => e.target.files[0] && onPhotoUpload(e.target.files[0])} />
+
+                    {photoUrl && (
+                        <button
+                            className={`go-live-btn ${isGenerating ? 'generating' : ''}`}
+                            style={{ marginTop: 10, background: isGenerating ? '#666' : '#8855ff', fontSize: 13, height: 35 }}
+                            onClick={onGenerate3D}
+                            disabled={isGenerating}
+                        >
+                            {isGenerating ? 'Loading TRELLIS...' : '✨ Generate 3D Avatar'}
+                        </button>
+                    )}
+
+                    <div style={{ marginTop: 15, padding: 10, background: '#111', borderRadius: 8, border: '1px solid #333' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
+                            <span style={{ fontSize: 12, color: '#8855ff', fontWeight: 'bold' }}>Qwen Sovereign Agent</span>
+                            <button onClick={talkToAgent} disabled={isAiLoading} style={{ fontSize: 10, padding: '2px 6px', background: '#333', color: '#fff', borderRadius: 4, cursor: 'pointer' }}>
+                                {isAiLoading ? 'Connecting...' : 'Query'}
+                            </button>
+                        </div>
+                        <p style={{ fontSize: 12, color: '#aaa', margin: 0, minHeight: 18 }}>
+                            {aiMessage || "Agent standby. Click Query to execute neural bridge."}
+                        </p>
+                    </div>
                 </div>
 
                 {/* ── STEP 2: Avatar GLB ── */}

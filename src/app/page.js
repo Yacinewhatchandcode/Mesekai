@@ -4,7 +4,7 @@ import { Button, Dropdown, Space, Switch } from 'antd'
 import { DownOutlined } from '@ant-design/icons'
 import { Camera } from '@mediapipe/camera_utils'
 import { DrawingUtils } from '@mediapipe/tasks-vision'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, Suspense } from 'react'
 import { Environment } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 
@@ -93,6 +93,7 @@ export default function Home() {
     // Avatar
     const [avatarUrl, setAvatarUrl] = useState(DEFAULT_AVATAR)
     const [photoUrl, setPhotoUrl] = useState(null)
+    const [photoFile, setPhotoFile] = useState(null)
     const [accessories, setAccessories] = useState([])
     const [availableBones, setAvailableBones] = useState([])
 
@@ -110,6 +111,7 @@ export default function Home() {
     const [loading, setLoading] = useState(true)
     const [loadProgress, setLoadProgress] = useState(0)
     const [loadStatus, setLoadStatus] = useState('Initializing...')
+    const [isGenerating, setIsGenerating] = useState(false)
 
     const { fps, tick } = useFPS()
     const video = useRef(null)
@@ -123,8 +125,35 @@ export default function Home() {
 
     const handlePhotoUpload = useCallback((file) => {
         if (!file) return
+        setPhotoFile(file)
         setPhotoUrl(URL.createObjectURL(file))
     }, [])
+
+    const handleGenerate3D = useCallback(async () => {
+        if (!photoFile) return
+        setIsGenerating(true)
+        try {
+            const formData = new FormData()
+            formData.append('image', photoFile)
+
+            // Call our next.js api which forwards to the A100 / PiAPI
+            const res = await fetch('/api/imageTo3d', {
+                method: 'POST',
+                body: formData
+            })
+            if (!res.ok) throw new Error('API failed')
+
+            // For now, assume it returns a raw GLB file stream
+            const blob = await res.blob()
+            const genUrl = URL.createObjectURL(blob)
+            setAvatarUrl(genUrl)
+        } catch (e) {
+            console.error(e)
+            alert('Failed to generate 3D avatar.')
+        } finally {
+            setIsGenerating(false)
+        }
+    }, [photoFile])
 
     const handleAddAccessory = useCallback((file) => {
         if (!file) return
@@ -208,19 +237,21 @@ export default function Home() {
             {/* ═══ 3D CANVAS (always rendered) ═══ */}
             <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
                 <Canvas style={{ position: 'absolute', inset: 0 }}>
-                    <Avatar
-                        avatarUrl={avatarUrl}
-                        accessories={accessories}
-                        userFace={faceLandmarks}
-                        userBody={bodyLandmarks}
-                        userLHand={lHandLandmarks}
-                        userRHand={rHandLandmarks}
-                        legsVisible={legsVisible}
-                        trackLegs={trackLegs}
-                        isLive={mode === 'live'}
-                        onBonesDetected={handleBonesDetected}
-                    />
-                    <Environment preset={scene} background={true} />
+                    <Suspense fallback={null}>
+                        <Avatar
+                            avatarUrl={avatarUrl}
+                            accessories={accessories}
+                            userFace={faceLandmarks}
+                            userBody={bodyLandmarks}
+                            userLHand={lHandLandmarks}
+                            userRHand={rHandLandmarks}
+                            legsVisible={legsVisible}
+                            trackLegs={trackLegs}
+                            isLive={mode === 'live'}
+                            onBonesDetected={handleBonesDetected}
+                        />
+                        <Environment preset={scene} background={true} />
+                    </Suspense>
                     <Controls lookAt={lookAt} />
                 </Canvas>
 
@@ -242,6 +273,8 @@ export default function Home() {
                         onAvatarUpload={handleAvatarUpload}
                         photoUrl={photoUrl}
                         onPhotoUpload={handlePhotoUpload}
+                        onGenerate3D={handleGenerate3D}
+                        isGenerating={isGenerating}
                         accessories={accessories}
                         onAddAccessory={handleAddAccessory}
                         onUpdateAccessory={handleUpdateAccessory}
