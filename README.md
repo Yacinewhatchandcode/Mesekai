@@ -4,6 +4,17 @@
     <img src='gif/customize.gif', width='40%' />
 </p>
 
+<div align="center">
+
+https://github.com/user-attachments/assets/demo.mp4
+
+**▶️ Watch the Demo**
+
+</div>
+
+---
+
+
 [Mesekai](https://mesekai.vercel.app/) is a real-time, full-body, webcam motion tracking avatar web application. Use your body gestures and facial expressions to animate a virtual persona. Personalize your experience through the built-in avatar creator.
 
 ## Tech Stack
