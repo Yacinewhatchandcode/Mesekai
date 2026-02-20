@@ -34,3 +34,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Security - never commit secrets
+.env.local
+.env.production
+.env.development
+*.key
+id_rsa
+id_ed25519
+credentials.json
