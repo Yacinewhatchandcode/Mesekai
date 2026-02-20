@@ -1,23 +1,64 @@
 import { FloatButton } from 'antd'
 import { CameraTwoTone, CameraOutlined } from '@ant-design/icons'
-import { useState } from 'react'
-
+import { useEffect, useRef, useState } from 'react'
 import '@/app/globals.css'
-import { CAM_WIDTH, CAM_HEIGHT } from '@/utils/constants'
 
+export default function CameraDisplay({ video, canvas }) {
+    const [hidden, setHidden] = useState(false)
+    const localVideoRef = useRef(null)
 
-export default function CameraDisplay({ video, canvas }){
-    const [hideCam, setHideCam] = useState(false)
+    // Mirror the hidden video feed into the visible element
+    useEffect(() => {
+        const srcVideo = video.current
+        const destVideo = localVideoRef.current
+        if (!srcVideo || !destVideo) return
+
+        // Use the same stream
+        const tryMirror = () => {
+            if (srcVideo.srcObject) {
+                destVideo.srcObject = srcVideo.srcObject
+                destVideo.play().catch(() => { })
+            } else {
+                setTimeout(tryMirror, 200)
+            }
+        }
+        tryMirror()
+    }, [video])
+
     return (
         <>
             <FloatButton
-                icon={hideCam? <CameraOutlined /> : <CameraTwoTone />}
-                style={{ position: 'absolute', top: '1%', right: '1%' }}
-                onClick={() => {setHideCam(prevState => !prevState)}}
+                icon={hidden ? <CameraOutlined /> : <CameraTwoTone />}
+                style={{ position: 'absolute', top: 16, right: 16, zIndex: 150 }}
+                onClick={() => setHidden(p => !p)}
             />
-            <div hidden={hideCam} style={{ position: 'absolute', top: '1%', right: '1%', zIndex: 1, pointerEvents: 'none' }}>
-                <video ref={video} id='cam-video'></video>
-                <canvas ref={canvas} width={CAM_WIDTH} height={CAM_HEIGHT} style={{ position: 'absolute', top: 0, left: 0, transform: 'scaleX(-1)', width: '100%', height: '100%'}}></canvas>
+            <div className="cam-container" hidden={hidden}>
+                <video
+                    ref={localVideoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    style={{
+                        transform: 'scaleX(-1)',
+                        width: 320,
+                        borderRadius: 16,
+                        border: '1px solid rgba(255,255,255,0.06)',
+                        boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+                    }}
+                />
+                <canvas
+                    ref={canvas}
+                    width={1920}
+                    height={1080}
+                    style={{
+                        position: 'absolute',
+                        top: 0, left: 0,
+                        transform: 'scaleX(-1)',
+                        width: '100%',
+                        height: '100%',
+                        pointerEvents: 'none',
+                    }}
+                />
             </div>
         </>
     )
