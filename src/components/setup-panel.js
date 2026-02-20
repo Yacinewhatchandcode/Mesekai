@@ -80,10 +80,10 @@ export default function SetupPanel({
                         <button
                             className={`go-live-btn ${isGenerating ? 'generating' : ''}`}
                             style={{ marginTop: 10, background: isGenerating ? '#666' : '#8855ff', fontSize: 13, height: 35 }}
-                            onClick={onGenerate3D}
+                            onClick={() => window.open('https://prime-ai.fr/checkout?product=yace-avatar-generator', '_blank')}
                             disabled={isGenerating}
                         >
-                            {isGenerating ? 'Loading TRELLIS...' : '✨ Generate 3D Avatar'}
+                            {isGenerating ? 'Loading TRELLIS...' : '🔒 Unlock 3D Generator (149€ HT)'}
                         </button>
                     )}
 
