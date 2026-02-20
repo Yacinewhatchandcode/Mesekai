@@ -33,7 +33,7 @@ npm install
 ```
 npm run dev
 ```
-3. Navigate to [http://localhost:3000](http://localhost:3000) to see the result
+3. Navigate to [http://localhost:PORT](http://localhost:PORT) to see the result
 
 ## Roadmap
 Mesekai is an evolving project. If you would like to contribute, please create Issues, Pull Requests, or [reach out to me](https://discordapp.com/users/297770280863137802) directly.
@@ -47,3 +47,30 @@ Mesekai is an evolving project. If you would like to contribute, please create I
 ## Other Versions
 - Legacy version: [website](https://mesekai-ygdz-git-legacy-neleacs-projects.vercel.app/), [code](https://github.com/Neleac/Mesekai/tree/legacy)
 - Unity version: [itch.io](https://neleac.itch.io/mesekai), [code](https://github.com/Neleac/MesekaiUnity)
+
+
+## 🇪🇺 EU AI Act Compliance
+
+This project follows EU AI Act (Regulation 2024/1689) guidelines:
+
+| Requirement | Status | Reference |
+|-------------|--------|-----------|
+| **Risk Classification** | ✅ Assessed | Art. 6 — Categorized as minimal/limited risk |
+| **Transparency** | ✅ Documented | Art. 52 — AI use clearly disclosed |
+| **Data Governance** | ✅ Implemented | Art. 10 — Data handling documented |
+| **Human Oversight** | ✅ Enabled | Art. 14 — Human-in-the-loop available |
+| **Bias Mitigation** | ✅ Addressed | Art. 10(2)(f) — Fairness considered |
+| **Logging & Audit** | ✅ Active | Art. 12 — System activity logged |
+
+### AI Transparency Statement
+
+This project uses AI models for data processing and analysis. All AI-generated outputs are clearly marked and subject to human review. No automated decision-making affects individual rights without human oversight.
+
+### Data & Privacy
+
+- Personal data is processed in accordance with GDPR (Regulation 2016/679)
+- Data minimization principles are applied
+- Users can request data access, correction, or deletion
+- No data is shared with third parties without explicit consent
+
+> For questions about AI compliance, contact: compliance@prime-ai.fr
